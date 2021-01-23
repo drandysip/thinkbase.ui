@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "thinkbase.ui", "thinkbase.ui.csproj", "{ECD3A59B-BD61-49D6-B9BE-94B2A5EC6054}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECD3A59B-BD61-49D6-B9BE-94B2A5EC6054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECD3A59B-BD61-49D6-B9BE-94B2A5EC6054}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECD3A59B-BD61-49D6-B9BE-94B2A5EC6054}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECD3A59B-BD61-49D6-B9BE-94B2A5EC6054}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F1275242-5D19-4C1B-B994-7515385167F9}
+	EndGlobalSection
+EndGlobal
