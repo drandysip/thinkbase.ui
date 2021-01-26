@@ -26,7 +26,6 @@ namespace thinkbase.ui
                 app.UseDeveloperExceptionPage();
             }
 
-
             app.UseStaticFiles();
 
 

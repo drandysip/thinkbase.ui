@@ -129,6 +129,11 @@ $(async function () {
             //getGraphData
             await loadGraphs();
         });
+        $('#kgdemo-dropdown').on('change', async function () {
+            mdname = this.value;
+            //getGraphData
+            await loadGraphs();
+        });
     }
 
     $('#kg-create').click(async function () {
@@ -254,14 +259,20 @@ function findGetParameter(parameterName) {
 }
 
 async function updateDropdown() {
-    const rs = await allkgmodels();
-    var dropdown = $('#kgmodel-dropdown');
+    var dropdown = demo ? $('#kgdemo-dropdown') : $('#kgmodel-dropdown');
     dropdown.empty();
-    dropdown.append('<option selected="true" disabled>Choose a Knowledge Graph to edit</option>');
+    dropdown.append('<option selected="true" disabled>Choose a Knowledge Graph.</option>');
     dropdown.prop('selectedIndex', 0);
-    $.each(rs.kgraphs, function (key, entry) {
-        dropdown.append($('<option class="dropdown-item"></option>').attr('value', entry.name).text(entry.name));
-    });
+    try {
+        const rs = await allkgmodels();
+        $.each(rs.kgraphs, function (key, entry) {
+            dropdown.append($('<option class="dropdown-item"></option>').attr('value', entry.name).text(entry.name));
+        });
+    }
+    catch (err) {
+        HandleError(err);
+    }
+
 }
 
  function updateStateDropdown() {
