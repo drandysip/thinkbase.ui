@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sales\\Source\\Repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj": {}
+    "C:\\Users\\sales\\source\\repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sales\\Source\\Repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj": {
+    "C:\\Users\\sales\\source\\repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sales\\Source\\Repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj",
+        "projectUniqueName": "C:\\Users\\sales\\source\\repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj",
         "projectName": "thinkbase.ui",
-        "projectPath": "C:\\Users\\sales\\Source\\Repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj",
+        "projectPath": "C:\\Users\\sales\\source\\repos\\drandysip\\thinkbase.ui\\thinkbase.ui.csproj",
         "packagesPath": "C:\\Users\\sales\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sales\\Source\\Repos\\drandysip\\thinkbase.ui\\obj\\",
+        "outputPath": "C:\\Users\\sales\\source\\repos\\drandysip\\thinkbase.ui\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\",
