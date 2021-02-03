@@ -56,6 +56,7 @@ var currentStateId;
 var settingsStorageName = 'thinkbase-settings';
 var demo = false;
 
+
 $(async function () {
     var existing = window.localStorage.getItem(settingsStorageName);
     existing = JSON.parse(existing);
@@ -1448,16 +1449,43 @@ async function loadGraphs() {
         virtualchanged = true;
         recchanged = true;
 
-        $('#real-find').click(async function () {
-            var externalId = $('#real-select').val();
-            var nodes = realcy.nodes().filter(function (element, i) {
-                return element.data('externalId') === externalId;
+        $('#real-find').click(function () {
+            $.MessageBox({
+                input: true,
+                message: "ExternalId to search for:",
+                buttonDone: "Find",
+                buttonFail: "Cancel",
+            }).done(function (data) {
+                if ($.trim(data)) {
+                    var nodes = realcy.nodes().filter(function (element, i) {
+                        return element.data('externalId') === $.trim(data);
+                    });
+                    realcy.fit(nodes, 300);
+                    nodes.emit('tap');
+                }
             });
-            realcy.fit(nodes, 300);
-            nodes.emit('tap');
         });
 
+        $('#real-help').click(function () {
+            ShowInfo("md/thinkbase/real_view.md");
+        });
 
+        $('#real-time').click(function () {
+            $.MessageBox({
+                input: true,
+                message: "ExternalId to search for:",
+                buttonDone: "Find",
+                buttonFail: "Cancel",
+            }).done(function (data) {
+                if ($.trim(data)) {
+                    var nodes = realcy.nodes().filter(function (element, i) {
+                        return element.data('externalId') === $.trim(data);
+                    });
+                    realcy.fit(nodes, 300);
+                    nodes.emit('tap');
+                }
+            });
+        });
 
         $('#real-fit').click(function () { realcy.fit(); });
         $('#virtual-fit').click(function () { virtualcy.fit(); });
