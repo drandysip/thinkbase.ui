@@ -54,7 +54,12 @@ var recognizedLineage = "adjective:8953";
 var currentStateId;
 
 var settingsStorageName = 'thinkbase-settings';
+var realStorageName = 'thinkbase-real';
 var demo = false;
+var dateDisplay = "Recent";
+var authoritative = true;
+var labels = "ExternalID";
+var inferenceTime = "Now";
 
 
 $(async function () {
@@ -62,6 +67,11 @@ $(async function () {
     existing = JSON.parse(existing);
     var url = (existing ? existing.url : "https://darl.dev");
     var key = (existing ? existing.key : "");
+    // Get real window settings
+    var real = window.localStorage.getItem(realStorageName);
+    dateDisplay = (real ? (real.dateDisplay ? real.dateDisplay : "Recent") : "Recent");
+    authoritative = (real ? (real.authoritative ? real.authoritative : true) : true);
+    labels = (real ? (real.labels ? real.labels : "ExternalID") : "ExternalID");
     graph = graphql(url + "/graphql");
     var apiKey = findGetParameter("apikey") ;
     mdname = findGetParameter("kgraph");
@@ -1472,18 +1482,99 @@ async function loadGraphs() {
 
         $('#real-time').click(function () {
             $.MessageBox({
-                input: true,
-                message: "ExternalId to search for:",
-                buttonDone: "Find",
+                input: {
+                    inferenceTime:
+                    {
+                        type: "select",
+                        defaultValue: inferenceTime,
+                        options: ["Now,Fixed"]
+                    }
+                },
+                message: "Use the current time or some fixed time to make inferences",
+                buttonDone: "Change",
+                buttonFail: "Cancel",               
+                filterDone: function (data) {
+                    if (data.inferenceTime === "") return "Select an inference time or cancel.";
+                }
+            }).done(async function (data) {
+                inferenceTime = data.inferenceTime;
+                if (inferenceTime === "Fixed") { //get the fixed time
+                    if (dateDisplay === "Historic") { 
+                        $.MessageBox({
+                            input: {
+                                date: {
+                                    type: "number",
+                                    label: "Year, -ve for BC"
+                                },
+                                time: {
+                                    type: "select",
+                                    label: "season",
+                                    options: ["Winter","Spring","Summer","Fall"]
+                                }
+                            },
+                            message: "Fixed time for inference",
+                            buttonDone: "Change",
+                            buttonFail: "Cancel",
+                        }).done(function (data) {
+ 
+                        });
+                    }
+                    else { //standard format
+                        $.MessageBox({
+                            input: {
+                                date: {
+                                    type: "date",
+                                    label: "Fixed Date"
+                                },
+                                time: {
+                                    type: "time",
+                                    label: "Fixed Time"
+                                }
+                            },
+                            message: "Fixed time for inference",
+                            buttonDone: "Change",
+                            buttonFail: "Cancel",
+                        }).done(function (data) {
+
+                        });
+                    }
+                }
+            });
+        });
+
+        $('#real-settings').click(function () {
+             $.MessageBox({
+                input: {
+                    dateDisplay: {
+                        type: "select",
+                        label: "Select how dates are displayed",
+                        options: ["Recent", "Historic"],
+                        defaultValue: dateDisplay
+                    },
+                    authoritative: {
+                        type: "checkbox",
+                        label: "New lineage relationships are authoritative.",
+                        defaultValue: authoritative
+                    },
+                    labels: {
+                        type: "select",
+                        label: "Select data displayed on nodes",
+                        options: ["ExternalId", "Name"],
+                        defaultValue: labels
+                    },
+                },
+                message: "Settings",
+                buttonDone: "Save",
                 buttonFail: "Cancel",
             }).done(function (data) {
-                if ($.trim(data)) {
-                    var nodes = realcy.nodes().filter(function (element, i) {
-                        return element.data('externalId') === $.trim(data);
-                    });
-                    realcy.fit(nodes, 300);
-                    nodes.emit('tap');
+                window.localStorage.setItem(settingsStorageName, JSON.stringify(data));
+                dateDisplay = data.dateDisplay;
+                authoritative = data.authoritative;
+                if (labels !== data.labels) {
+                    //redraw real graph.
                 }
+                labels = data.labels;
+                
             });
         });
 
