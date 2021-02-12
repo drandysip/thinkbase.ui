@@ -1,4 +1,4 @@
-﻿
+
 var allkgmodels;
 var graph;
 var realkgraphdata;
@@ -54,24 +54,13 @@ var recognizedLineage = "adjective:8953";
 var currentStateId;
 
 var settingsStorageName = 'thinkbase-settings';
-var realStorageName = 'thinkbase-real';
 var demo = false;
-var dateDisplay = "Recent";
-var authoritative = true;
-var labels = "ExternalID";
-var inferenceTime = "Now";
-
 
 $(async function () {
     var existing = window.localStorage.getItem(settingsStorageName);
     existing = JSON.parse(existing);
     var url = (existing ? existing.url : "https://darl.dev");
     var key = (existing ? existing.key : "");
-    // Get real window settings
-    var real = window.localStorage.getItem(realStorageName);
-    dateDisplay = (real ? (real.dateDisplay ? real.dateDisplay : "Recent") : "Recent");
-    authoritative = (real ? (real.authoritative ? real.authoritative : true) : true);
-    labels = (real ? (real.labels ? real.labels : "ExternalID") : "ExternalID");
     graph = graphql(url + "/graphql");
     var apiKey = findGetParameter("apikey") ;
     mdname = findGetParameter("kgraph");
@@ -90,7 +79,7 @@ $(async function () {
     virtualkgraphdata = graph('query vkgd($model: String!){getVirtualKGDisplay(graphName: $model){nodes{data{ id lineage parent}} edges{ data{ id label source target}}}}');
     recognitionkgraphdata = graph('query rkgd($model: String!){getRecognitionKGDisplay(graphName: $model){nodes{data{ id label lineage parent}} edges{ data{ id label source target}}}}');
     realobjectdata = graph('query rod($model: String! $id: String!){getGraphObjectById(graphName: $model id: $id){name lineage subLineage id externalId properties {name lineage value type confidence}}}');
-    realConnectiondata = graph('query rcd($model: String! $id: String!){getGraphConnectionById(graphName: $model id: $id){name lineage id }}');
+    realConnectiondata = graph('query rcd($model: String! $id: String!){getGraphConnectionById(graphName: $model id: $id){name lineage id existence}}');
     virtualobjectdata = graph('query vod($model: String! $lineage: String!){getVirtualObjectByLineage(graphName: $model lineage: $lineage){name lineage id properties {name lineage value type confidence}}}');
     recognitionobjectdata = graph('query recod($model: String! $id: String!){getRecognitionObjectById(graphName: $model id: $id){name lineage id properties {name lineage value type confidence}}}');
     realeditorchange = graph('mutation rec($model: String! $goj: String!){updateGraphObjectFromJSON(graphName: $model graphObjectJSON: $goj ontology: BUILD) {id}}');
@@ -140,11 +129,6 @@ $(async function () {
             //getGraphData
             await loadGraphs();
         });
-        $('#kgdemo-dropdown').on('change', async function () {
-            mdname = this.value;
-            //getGraphData
-            await loadGraphs();
-        });
     }
 
     $('#kg-create').click(async function () {
@@ -184,8 +168,8 @@ $(async function () {
             }
             }).done(async function (data) {
             try {
-                await createclonedkg({ name: mdname, newname: data.newName });
-                alert(mdname + " copied to " + data.newName + ".");
+                await createclonedkg({ name: mdname, newname: dataNewName });
+                alert(mdname + " copied to " + copyname + ".");
                 await updateDropdown();
             }
             catch (err) {
@@ -270,20 +254,14 @@ function findGetParameter(parameterName) {
 }
 
 async function updateDropdown() {
-    var dropdown = demo ? $('#kgdemo-dropdown') : $('#kgmodel-dropdown');
+    const rs = await allkgmodels();
+    var dropdown = $('#kgmodel-dropdown');
     dropdown.empty();
-    dropdown.append('<option selected="true" disabled>Choose a Knowledge Graph.</option>');
+    dropdown.append('<option selected="true" disabled>Choose a Knowledge Graph to edit</option>');
     dropdown.prop('selectedIndex', 0);
-    try {
-        const rs = await allkgmodels();
-        $.each(rs.kgraphs, function (key, entry) {
-            dropdown.append($('<option class="dropdown-item"></option>').attr('value', entry.name).text(entry.name));
-        });
-    }
-    catch (err) {
-        HandleError(err);
-    }
-
+    $.each(rs.kgraphs, function (key, entry) {
+        dropdown.append($('<option class="dropdown-item"></option>').attr('value', entry.name).text(entry.name));
+    });
 }
 
  function updateStateDropdown() {
@@ -656,8 +634,9 @@ async function loadGraphs() {
                                         },
                                         sublineage:
                                         {
-                                            type: "caption",
-                                            message: sublin
+                                            type: "text",
+                                            message: "The sub-lineage",
+                                            defaultValue: sublin
                                         },
                                         subtypeword:
                                         {
@@ -668,6 +647,9 @@ async function loadGraphs() {
                                     message: "The lineage"
                                 }).done(function (data) {
                                     console.log(data);
+                                    if (data.sublineage !== sublin) {
+                                        await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
+                                    }
                                 });
                             }
                         }
@@ -1459,124 +1441,16 @@ async function loadGraphs() {
         virtualchanged = true;
         recchanged = true;
 
-        $('#real-find').click(function () {
-            $.MessageBox({
-                input: true,
-                message: "ExternalId to search for:",
-                buttonDone: "Find",
-                buttonFail: "Cancel",
-            }).done(function (data) {
-                if ($.trim(data)) {
-                    var nodes = realcy.nodes().filter(function (element, i) {
-                        return element.data('externalId') === $.trim(data);
-                    });
-                    realcy.fit(nodes, 300);
-                    nodes.emit('tap');
-                }
+        $('#real-find').click(async function () {
+            var externalId = $('#real-select').val();
+            var nodes = realcy.nodes().filter(function (element, i) {
+                return element.data('externalId') === externalId;
             });
+            realcy.fit(nodes, 300);
+            nodes.emit('tap');
         });
 
-        $('#real-help').click(function () {
-            ShowInfo("md/thinkbase/real_view.md");
-        });
 
-        $('#real-time').click(function () {
-            $.MessageBox({
-                input: {
-                    inferenceTime:
-                    {
-                        type: "select",
-                        defaultValue: inferenceTime,
-                        options: ["Now,Fixed"]
-                    }
-                },
-                message: "Use the current time or some fixed time to make inferences",
-                buttonDone: "Change",
-                buttonFail: "Cancel",               
-                filterDone: function (data) {
-                    if (data.inferenceTime === "") return "Select an inference time or cancel.";
-                }
-            }).done(async function (data) {
-                inferenceTime = data.inferenceTime;
-                if (inferenceTime === "Fixed") { //get the fixed time
-                    if (dateDisplay === "Historic") { 
-                        $.MessageBox({
-                            input: {
-                                date: {
-                                    type: "number",
-                                    label: "Year, -ve for BC"
-                                },
-                                time: {
-                                    type: "select",
-                                    label: "season",
-                                    options: ["Winter","Spring","Summer","Fall"]
-                                }
-                            },
-                            message: "Fixed time for inference",
-                            buttonDone: "Change",
-                            buttonFail: "Cancel",
-                        }).done(function (data) {
- 
-                        });
-                    }
-                    else { //standard format
-                        $.MessageBox({
-                            input: {
-                                date: {
-                                    type: "date",
-                                    label: "Fixed Date"
-                                },
-                                time: {
-                                    type: "time",
-                                    label: "Fixed Time"
-                                }
-                            },
-                            message: "Fixed time for inference",
-                            buttonDone: "Change",
-                            buttonFail: "Cancel",
-                        }).done(function (data) {
-
-                        });
-                    }
-                }
-            });
-        });
-
-        $('#real-settings').click(function () {
-             $.MessageBox({
-                input: {
-                    dateDisplay: {
-                        type: "select",
-                        label: "Select how dates are displayed",
-                        options: ["Recent", "Historic"],
-                        defaultValue: dateDisplay
-                    },
-                    authoritative: {
-                        type: "checkbox",
-                        label: "New lineage relationships are authoritative.",
-                        defaultValue: authoritative
-                    },
-                    labels: {
-                        type: "select",
-                        label: "Select data displayed on nodes",
-                        options: ["ExternalId", "Name"],
-                        defaultValue: labels
-                    },
-                },
-                message: "Settings",
-                buttonDone: "Save",
-                buttonFail: "Cancel",
-            }).done(function (data) {
-                window.localStorage.setItem(settingsStorageName, JSON.stringify(data));
-                dateDisplay = data.dateDisplay;
-                authoritative = data.authoritative;
-                if (labels !== data.labels) {
-                    //redraw real graph.
-                }
-                labels = data.labels;
-                
-            });
-        });
 
         $('#real-fit').click(function () { realcy.fit(); });
         $('#virtual-fit').click(function () { virtualcy.fit(); });
