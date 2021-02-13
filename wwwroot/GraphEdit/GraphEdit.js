@@ -619,7 +619,7 @@ async function loadGraphs() {
                                 var sublin = obj.getGraphObjectById.subLineage;
                                 if (sublin) {
                                     subTypeword = await gettypeword({ lin: sublin }).getTypeWordForLineage;
-                                }
+                                }                                
                                 $.MessageBox({
                                     input: {
                                         lineage:
@@ -635,7 +635,7 @@ async function loadGraphs() {
                                         sublineage:
                                         {
                                             type: "text",
-                                            message: "The sub-lineage",
+                                            label: "The sub-lineage",
                                             defaultValue: sublin
                                         },
                                         subtypeword:
@@ -644,8 +644,10 @@ async function loadGraphs() {
                                             message: subTypeword
                                         }
                                     },
-                                    message: "The lineage"
-                                }).done(async function (data) {
+                                    message: "The lineage",
+                                    buttonDone: "Change",
+                                    buttonFail: "Cancel",
+                                }).done( async function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
                                         await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
