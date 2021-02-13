@@ -651,7 +651,7 @@ async function loadGraphs() {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
                                          try {
-                                            await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
+                                             await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage, lineage: lin } });
                                         }
                                         catch (err) {
                                             HandleError(err);
