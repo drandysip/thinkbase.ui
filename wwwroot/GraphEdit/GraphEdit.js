@@ -638,7 +638,7 @@ async function loadGraphs() {
                                         sublineage:
                                         {
                                             type: "text",
-                                            message: "The sub-lineage",
+                                            label: "The sub-lineage",
                                             defaultValue: sublin
                                         },
                                         subtypeword:
@@ -651,7 +651,12 @@ async function loadGraphs() {
                                 }).done(function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
-                                        await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
+                                        try {
+                                             await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage, lineage: lin } });
+                                        }
+                                        catch (err) {
+                                            HandleError(err);
+                                        }
                                     }
                                 });
                             }
