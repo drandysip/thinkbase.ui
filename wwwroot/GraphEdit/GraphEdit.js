@@ -650,7 +650,7 @@ async function loadGraphs() {
                                     message: "The lineage",
                                     buttonDone: "Change",
                                     buttonFail: "Cancel",
-                                }).done(function (data) {
+                                }).done( async function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
                                         try {
