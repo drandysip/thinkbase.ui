@@ -56,6 +56,9 @@ var currentStateId;
 var settingsStorageName = 'thinkbase-settings';
 var demo = false;
 
+var lastConnectionName = "";
+var lastConnectionExistingLineage = "";
+
 $(async function () {
     var existing = window.localStorage.getItem(settingsStorageName);
     existing = JSON.parse(existing);
@@ -619,7 +622,7 @@ async function loadGraphs() {
                                 var sublin = obj.getGraphObjectById.subLineage;
                                 if (sublin) {
                                     subTypeword = await gettypeword({ lin: sublin }).getTypeWordForLineage;
-                                }                                
+                                }
                                 $.MessageBox({
                                     input: {
                                         lineage:
@@ -635,7 +638,7 @@ async function loadGraphs() {
                                         sublineage:
                                         {
                                             type: "text",
-                                            label: "The sub-lineage",
+                                            message: "The sub-lineage",
                                             defaultValue: sublin
                                         },
                                         subtypeword:
@@ -644,18 +647,11 @@ async function loadGraphs() {
                                             message: subTypeword
                                         }
                                     },
-                                    message: "The lineage",
-                                    buttonDone: "Change",
-                                    buttonFail: "Cancel",
-                                }).done( async function (data) {
+                                    message: "The lineage"
+                                }).done(function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
-                                         try {
-                                             await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage, lineage: lin } });
-                                        }
-                                        catch (err) {
-                                            HandleError(err);
-                                        }
+                                        await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
                                     }
                                 });
                             }
@@ -1065,7 +1061,8 @@ async function loadGraphs() {
                     name:
                     {
                         type: "text",
-                        label: "Name"
+                        label: "Name",
+                        defaultValue: lastConnectionName
                     },
                     sep_caption: {
                         type: "caption",
@@ -1074,7 +1071,8 @@ async function loadGraphs() {
                     existinglineage: {
                         label: "existing lineages",
                         type: "select",
-                        options: obj
+                        options: obj,
+                        defaultValue: lastConnectionExistingLineage
                     },
                     newlineage: {
                         type: "text",
@@ -1091,8 +1089,10 @@ async function loadGraphs() {
 
             }).done(async function (data) {
                 var lin;
+                lastConnectionName = data.name;
                 if (data.existinglineage) {
                     lin = data.existinglineage;
+                    lastConnectionExistingLineage = data.existinglineage;
                     await CreateConnection(addedEles, sourceNode, targetNode, data.name, lin);
                 }
                 else {
