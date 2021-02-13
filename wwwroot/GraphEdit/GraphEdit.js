@@ -645,7 +645,7 @@ async function loadGraphs() {
                                         }
                                     },
                                     message: "The lineage"
-                                }).done(function (data) {
+                                }).done(async function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
                                         await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
