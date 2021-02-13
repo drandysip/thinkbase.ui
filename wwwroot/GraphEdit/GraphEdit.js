@@ -650,7 +650,12 @@ async function loadGraphs() {
                                 }).done( async function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
-                                        await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
+                                         try {
+                                            await updateGraphObject({ name: mdname, obj: { id: ele.id(), subLineage: data.sublineage } });
+                                        }
+                                        catch (err) {
+                                            HandleError(err);
+                                        }
                                     }
                                 });
                             }
