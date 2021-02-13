@@ -647,7 +647,9 @@ async function loadGraphs() {
                                             message: subTypeword
                                         }
                                     },
-                                    message: "The lineage"
+                                    message: "The lineage",
+                                    buttonDone: "Change",
+                                    buttonFail: "Cancel",
                                 }).done(function (data) {
                                     console.log(data);
                                     if (data.sublineage !== sublin) {
